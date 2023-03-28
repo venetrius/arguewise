@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'A CloudFormation template to create an IAM user with permissions to manage CloudFormation stacks.'
+
+Resources:
+  CloudFormationUser:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: 'CloudFormationUser'
+
+  CloudFormationPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: 'CloudFormationPolicy'
+      Users:
+        - !Ref CloudFormationUser
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            "Action": [
+                "cloudformation:*",
+                "iam:CreateRole",
+                "iam:AttachRolePolicy",
+                "iam:PassRole",
+                "iam:DetachRolePolicy",
+                "iam:GetRole",
+                "lambda:*",
+                "s3:*"
+            ]
+            Resource: '*'

@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'A simple AWS CloudFormation template to create a Lambda function named "hello" and an S3 bucket.'
+
+Resources:
+  LambdaCodeBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: 'hello-lambda-source-bucket'
+
+  HelloLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: 'hello'
+      Handler: 'index.handler'
+      Runtime: 'nodejs14.x'
+      CodeUri:
+        Bucket: !Ref LambdaCodeBucket
+        Key: 'YOUR_S3_KEY'
+      Events:
+        HttpApi:
+          Type: 'HttpApi'
+          Properties:
+            Path: '/hello'
+            Method: 'GET'
+
+Outputs:
+  LambdaFunctionArn:
+    Description: 'ARN of the Lambda function'
+    Value: !GetAtt HelloLambdaFunction.Arn
+  HttpApiUrl:
+    Description: 'URL of the HTTP API endpoint'
+    Value: !Sub 'https://${HelloLambdaFunction.HttpApi}.execute-api.${AWS::Region}.amazonaws.com/'
+  S3BucketName:
+    Description: 'Name of the created S3 bucket'
+    Value: !Ref LambdaCodeBucket
+
+# aws cloudformation create-stack --stack-name hello-lambda-stack --template-body file://hello-lambda.yaml --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
+
+# {
+#     "StackId": "arn:aws:cloudformation:eu-north-1:738120348687:stack/hello-lambda-stack/ad10ac90-cdb1-11ed-9203-0e95b97c8bc0"
+# }
+
+# aws cloudformation describe-stacks --stack-name arn:aws:cloudformation:eu-north-1:738120348687:stack/hello-lambda-stack/ad10ac90-cdb1-11ed-9203-0e95b97c8bc0
+
+# aws cloudformation delete-stack --stack-name arn:aws:cloudformation:eu-north-1:738120348687:stack/hello-lambda-stack/7bc50b90-cdb1-11ed-b8f4-0eb3fddac932
+
+# aws cloudformation create-stack --stack-name hello-lambda-stack --template-body file://hello-lambda.yaml --capabilities CAPABILITY_AUTO_EXPAND
